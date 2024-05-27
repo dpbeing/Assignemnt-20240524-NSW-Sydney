@@ -1,6 +1,5 @@
 import pandas as pd
 from datetime import datetime
-from entity import Address, Employee
 
 def transform_data(df):
     """
@@ -40,31 +39,12 @@ def transform_data(df):
             return 'C'
 
     df['SalaryBucket'] = df['Salary'].apply(categorize_salary)
-
+    df['Address'] = df.apply(lambda row: {
+        'Street': row['Address'],
+        'Suburb': row['Suburb'],
+        'State': row['State'],
+        'Post': row['Post']
+    }, axis=1)
     # Drop FirstName and LastName columns
     df = df.drop(columns=['FirstName', 'LastName'])
-
-    # Build nested entity class
-    employees = []
-    for _, row in df.iterrows():
-        address = Address(
-            street=row['Address'],
-            suburb=row['Suburb'],
-            state=row['State'],
-            post_code=row['Post']
-        )
-        employee = Employee(
-            full_name=row['FullName'],
-            company=row['Company'],
-            birth_date=row['BirthDate'],
-            age=row['Age'],
-            salary=row['Salary'],
-            salary_bucket=row['SalaryBucket'],
-            phone=row['Phone'],
-            mobile=row['Mobile'],
-            email=row['Email'],
-            address=address
-        )
-        employees.append(employee)
-
-    return employees
+    return df
